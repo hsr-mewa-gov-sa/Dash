@@ -1,28 +1,51 @@
-<script type="module">
-  import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.mjs';
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عرض PDF</title>
+  <style>
+    body { margin:0; padding:0; }
+    #pdf-container { width:100%; height:100vh; overflow:auto; background:#f0f0f0; }
+    canvas { display:block; margin:10px auto; box-shadow:0 0 5px rgba(0,0,0,0.3); }
+  </style>
+</head>
+<body>
+  <div id="pdf-container"></div>
 
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.worker.min.js';
+  <!-- تحميل مكتبة PDF.js التقليدية -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.172/pdf.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof pdfjsLib === 'undefined') {
+        alert('لم يتم تحميل مكتبة PDF.js بنجاح.');
+        return;
+      }
 
-  const container = document.getElementById('pdf-container');
-  const url = './26_08_25_15_01_164027.pdf'; // تأكد إن الملف موجود في نفس المجلد
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.172/pdf.worker.min.js';
 
-  const loadingTask = pdfjsLib.getDocument(url);
-  loadingTask.promise.then(async pdf => {
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale: 1.2 });
+      const container = document.getElementById('pdf-container');
+      const url = './26_08_25_15_01_164027.pdf'; // تأكد أن الملف موجود في نفس المجلد
 
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+      pdfjsLib.getDocument(url).promise.then(async pdf => {
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: 1.2 });
 
-      container.appendChild(canvas);
-      await page.render({ canvasContext: context, viewport }).promise;
-    }
-  }).catch(err => {
-    container.innerHTML = `<p style="color:red; text-align:center; margin-top:20px;">
-      حدث خطأ أثناء تحميل الملف: ${err.message}
-    </p>`;
-  });
-</script>
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          container.appendChild(canvas);
+          await page.render({ canvasContext: context, viewport }).promise;
+        }
+      }).catch(err => {
+        container.innerHTML = `<p style="color:red; text-align:center; margin-top:20px;">
+          حدث خطأ أثناء تحميل الملف: ${err.message}
+        </p>`;
+      });
+    });
+  </script>
+</body>
+</html>
