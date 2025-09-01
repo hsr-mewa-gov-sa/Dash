@@ -2,47 +2,30 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>عرض PDF</title>
+  <title>قراءة PDF عبر PDF.js</title>
   <style>
-    body { margin:0; padding:0; }
-    #pdf-container { width:100%; height:100vh; overflow:auto; background:#f0f0f0; }
-    canvas { display:block; margin:10px auto; box-shadow:0 0 5px rgba(0,0,0,0.3); }
+    body { font-family: Arial, sans-serif; }
+    #pdf-canvas { border: 1px solid #333; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <div id="pdf-container"></div>
-
-  <!-- تحميل مكتبة PDF.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.172/pdf.min.js"></script>
+  <h2>عرض صفحة PDF باستخدام PDF.js</h2>
+  <canvas id="pdf-canvas"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      if (typeof pdfjsLib === 'undefined') {
-        alert('لم يتم تحميل مكتبة PDF.js بنجاح. تحقق من الرابط أو اتصال الإنترنت.');
-        return;
-      }
-
-      // إعداد الـ Worker
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.172/pdf.worker.min.js';
-
-      const container = document.getElementById('pdf-container');
-      const url = './26_08_25_15_01_164027.pdf'; // تأكد من صحة المسار
-
-      pdfjsLib.getDocument(url).promise.then(async pdf => {
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const viewport = page.getViewport({ scale: 1.2 });
-          const canvas = document.createElement('canvas');
-          const context = canvas.getContext('2d');
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          container.appendChild(canvas);
-          await page.render({ canvasContext: context, viewport }).promise;
-        }
-      }).catch(err => {
-        container.innerHTML = `<p style="color:red; text-align:center; margin-top:20px;">
-          حدث خطأ أثناء تحميل الملف: ${err.message}
-        </p>`;
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.worker.min.js";
+    const url = 'https://mozilla.github.io/pdf.js/examples/learning/helloworld.pdf';
+    pdfjsLib.getDocument(url).promise.then(function(pdf) {
+      pdf.getPage(1).then(function(page) {
+        var scale = 1.5;
+        var viewport = page.getViewport({ scale });
+        var canvas = document.getElementById('pdf-canvas');
+        var context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        var renderContext = { canvasContext: context, viewport: viewport };
+        page.render(renderContext);
       });
     });
   </script>
