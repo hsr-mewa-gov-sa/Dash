@@ -13,29 +13,36 @@
 <body>
   <div id="pdf-container"></div>
 
-  <!-- تحميل مكتبة PDF.js أولاً -->
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.min.js"></script>
-
-  <!-- بعد تحميل المكتبة، ننفذ كود عرض PDF -->
+  <!-- تحميل مكتبة PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.172/pdf.min.js"></script>
   <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.worker.min.js';
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof pdfjsLib === 'undefined') {
+        alert('لم يتم تحميل مكتبة PDF.js بنجاح. تحقق من الرابط أو اتصال الإنترنت.');
+        return;
+      }
 
-    document.addEventListener('DOMContentLoaded', () => {
+      // إعداد الـ Worker
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.172/pdf.worker.min.js';
+
       const container = document.getElementById('pdf-container');
-      const url = './26_08_25_15_01_164027.pdf';
+      const url = './26_08_25_15_01_164027.pdf'; // تأكد من صحة المسار
 
       pdfjsLib.getDocument(url).promise.then(async pdf => {
-        for (let i=1; i<=pdf.numPages; i++) {
+        for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const viewport = page.getViewport({ scale: 1.2 });
           const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
           canvas.width = viewport.width;
           canvas.height = viewport.height;
           container.appendChild(canvas);
-          await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+          await page.render({ canvasContext: context, viewport }).promise;
         }
       }).catch(err => {
-        container.innerHTML = `<p style="color:red; text-align:center; margin-top:20px;">حدث خطأ أثناء تحميل الملف: ${err.message}</p>`;
+        container.innerHTML = `<p style="color:red; text-align:center; margin-top:20px;">
+          حدث خطأ أثناء تحميل الملف: ${err.message}
+        </p>`;
       });
     });
   </script>
