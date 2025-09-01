@@ -1,18 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PDF Viewer</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.172/pdf.min.js"></script>
-  <style>canvas { width: 100%; height: auto; }</style>
+  <style>
+    html, body { margin:0; padding:0; height:100%; }
+    #pdf-render { width: 100%; height: 100vh; display: block; }
+  </style>
 </head>
 <body>
   <canvas id="pdf-render"></canvas>
   <script>
-    const url = '26_08_25_15_01_164027.pdf';
+    const url = '26_08_25_15_01_164027.pdf'; // ملف PDF في نفس الريبو
     const loadingTask = pdfjsLib.getDocument(url);
     loadingTask.promise.then(pdf => {
       pdf.getPage(1).then(page => {
-        const viewport = page.getViewport({scale: 1.5});
+        const viewport = page.getViewport({scale:1.5});
         const canvas = document.getElementById('pdf-render');
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
