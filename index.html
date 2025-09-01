@@ -1,31 +1,62 @@
-<script type="module">
-  import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.mjs';
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عرض PDF</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    #pdf-container {
+      width: 100%;
+      height: 100vh;
+      overflow: auto;
+      background: #f0f0f0;
+    }
+    canvas {
+      display: block;
+      margin: 10px auto;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+  <div id="pdf-container"></div>
 
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.worker.min.js';
+  <!-- تحميل مكتبة PDF.js التقليدية -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.min.js"></script>
+  <script>
+    // ضبط worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.worker.min.js';
 
-  window.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('pdf-container');
-    const url = './26_08_25_15_01_164027.pdf';
+    window.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('pdf-container');
+      const url = './26_08_25_15_01_164027.pdf'; // ضع ملف PDF في نفس المجلد
 
-    const loadingTask = pdfjsLib.getDocument(url);
-    loadingTask.promise.then(async pdf => {
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 1.2 });
+      const loadingTask = pdfjsLib.getDocument(url);
+      loadingTask.promise.then(async pdf => {
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const viewport = page.getViewport({ scale: 1.2 });
 
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
 
-        container.appendChild(canvas);
+          container.appendChild(canvas);
 
-        await page.render({ canvasContext: context, viewport }).promise;
-      }
-    }).catch(err => {
-      container.innerHTML = `<p style="color:red; text-align:center; margin-top:20px;">
-        حدث خطأ أثناء تحميل الملف: ${err.message}
-      </p>`;
+          await page.render({ canvasContext: context, viewport }).promise;
+        }
+      }).catch(err => {
+        container.innerHTML = `<p style="color:red; text-align:center; margin-top:20px;">
+          حدث خطأ أثناء تحميل الملف: ${err.message}
+        </p>`;
+      });
     });
-  });
-</script>
+  </script>
+</body>
+</html>
