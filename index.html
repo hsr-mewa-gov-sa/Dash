@@ -1,29 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Viewer</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.172/pdf.min.js"></script>
-  <style>
-    html, body { margin:0; padding:0; height:100%; }
-    #pdf-render { width: 100%; height: 100vh; display: block; }
-  </style>
+  <title>عرض PDF</title>
 </head>
-<body>
-  <canvas id="pdf-render"></canvas>
+<body style="margin:0;padding:0;">
+  <div id="pdf-container" style="width:100%;height:100vh;overflow:auto;"></div>
+
+  <!-- إضافة مكتبة PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.172/pdf.min.js"></script>
+
   <script>
-    const url = '26_08_25_15_01_164027.pdf'; // ملف PDF في نفس الريبو
+    const url = './26_08_25_15_01_164027.pdf'; // مسار PDF
+    const container = document.getElementById('pdf-container');
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.172/pdf.worker.min.js';
+
     const loadingTask = pdfjsLib.getDocument(url);
-    loadingTask.promise.then(pdf => {
-      pdf.getPage(1).then(page => {
-        const viewport = page.getViewport({scale:1.5});
-        const canvas = document.getElementById('pdf-render');
+    loadingTask.promise.then(async pdf => {
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1.2 });
+        const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-        page.render({canvasContext: context, viewport: viewport});
-      });
+        container.appendChild(canvas);
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+      }
+    }).catch(err => {
+      container.innerHTML = `<p style="color:red;">حدث خطأ أثناء تحميل الملف: ${err.message}</p>`;
     });
   </script>
 </body>
