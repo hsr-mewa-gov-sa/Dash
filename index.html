@@ -3,26 +3,28 @@
 
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.worker.min.js';
 
-  const container = document.getElementById('pdf-container');
-  const url = './26_08_25_15_01_164027.pdf'; // تأكد أن الملف موجود في نفس المجلد
+  window.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('pdf-container');
+    const url = './26_08_25_15_01_164027.pdf'; // تأكد إن الملف موجود في نفس المجلد
 
-  const loadingTask = pdfjsLib.getDocument(url);
-  loadingTask.promise.then(async pdf => {
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale: 1.2 });
+    const loadingTask = pdfjsLib.getDocument(url);
+    loadingTask.promise.then(async pdf => {
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1.2 });
 
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
 
-      container.appendChild(canvas);
-      await page.render({ canvasContext: context, viewport }).promise;
-    }
-  }).catch(err => {
-    container.innerHTML = `<p style="color:red; text-align:center; margin-top:20px;">
-      حدث خطأ أثناء تحميل الملف: ${err.message}
-    </p>`;
+        container.appendChild(canvas);
+        await page.render({ canvasContext: context, viewport }).promise;
+      }
+    }).catch(err => {
+      container.innerHTML = `<p style="color:red; text-align:center; margin-top:20px;">
+        حدث خطأ أثناء تحميل الملف: ${err.message}
+      </p>`;
+    });
   });
 </script>
