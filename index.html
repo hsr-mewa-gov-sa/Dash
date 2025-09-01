@@ -6,16 +6,10 @@
   <title>عرض PDF</title>
   <style>
     body { margin:0; padding:0; }
-    #pdf-container { width:100%; height:100vh; }
+    iframe { width:100%; height:100vh; border:0; }
   </style>
 </head>
 <body>
-  <div id="pdf-container"></div>
-
-  <!-- مكتبة PDFObject -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.2.8/pdfobject.min.js"></script>
-  <script>
-    PDFObject.embed("26_08_25_15_01_164027.pdf", "#pdf-container");
-  </script>
+  <iframe src="26_08_25_15_01_164027.pdf"></iframe>
 </body>
 </html>
