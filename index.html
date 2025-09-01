@@ -1,33 +1,28 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-  <meta charset="UTF-8">
-  <title>قراءة PDF عبر PDF.js</title>
-  <style>
-    body { font-family: Arial, sans-serif; }
-    #pdf-canvas { border: 1px solid #333; margin-top: 10px; }
-  </style>
-</head>
-<body>
-  <h2>عرض صفحة PDF باستخدام PDF.js</h2>
-  <canvas id="pdf-canvas"></canvas>
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.min.js"></script>
-  <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.worker.min.js";
-    const url = 'https://mozilla.github.io/pdf.js/examples/learning/helloworld.pdf';
-    pdfjsLib.getDocument(url).promise.then(function(pdf) {
-      pdf.getPage(1).then(function(page) {
-        var scale = 1.5;
-        var viewport = page.getViewport({ scale });
-        var canvas = document.getElementById('pdf-canvas');
-        var context = canvas.getContext('2d');
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-        var renderContext = { canvasContext: context, viewport: viewport };
-        page.render(renderContext);
-      });
-    });
-  </script>
-</body>
-</html>
+<script type="module">
+  import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.mjs';
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.172/build/pdf.worker.min.js';
+
+  const container = document.getElementById('pdf-container');
+  const url = './26_08_25_15_01_164027.pdf'; // تأكد أن الملف موجود في نفس المجلد
+
+  const loadingTask = pdfjsLib.getDocument(url);
+  loadingTask.promise.then(async pdf => {
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const viewport = page.getViewport({ scale: 1.2 });
+
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      container.appendChild(canvas);
+      await page.render({ canvasContext: context, viewport }).promise;
+    }
+  }).catch(err => {
+    container.innerHTML = `<p style="color:red; text-align:center; margin-top:20px;">
+      حدث خطأ أثناء تحميل الملف: ${err.message}
+    </p>`;
+  });
+</script>
